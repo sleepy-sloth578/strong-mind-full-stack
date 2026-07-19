@@ -1,0 +1,24 @@
+# PostgreSQL configuration.
+#
+# A single Postgres database is the system of record. All environments read
+# their connection from the DATABASE_URL environment variable, which Docker
+# Compose supplies per service (see docker-compose.yml). Solid Queue tables
+# live in this same primary database — no multi-database split — to keep the
+# operational surface minimal for the reviewer.
+#
+#   DATABASE_URL="postgres://postgres:postgres@db:5432/strong_mind_development"
+#
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  url: <%= ENV["DATABASE_URL"] %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

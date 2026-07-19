@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+# Ensure the database exists and the schema (including Solid Queue tables) is
+# loaded before running whatever command the container was started with.
+# db:prepare is idempotent, so it is safe for every service (web, worker,
+# ingest, test) and safe to run repeatedly across restarts.
+./bin/rails db:prepare
+
+exec "${@}"

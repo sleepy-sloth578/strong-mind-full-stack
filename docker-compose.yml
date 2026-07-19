@@ -1,0 +1,59 @@
+#  docker compose up --build          # starts db + Solid Queue worker (long-running)
+#  docker compose run --rm ingest     # runs one ingestion cycle, then exits
+#  docker compose run --rm test       # runs the test suite
+#
+
+# Shared build + app config, reused by every Rails service via YAML anchors.
+# All app services (worker, ingest, test) share ONE image — same Dockerfile,
+# same context — so they can never drift out of sync. Only the runtime env and
+# command differ per service.
+x-app: &app
+  build:
+    context: .
+  image: strong-mind-full-stack:app
+  volumes:
+    - .:/rails
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: strong_mind_development
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  worker:
+    <<: *app
+    environment:
+      RAILS_ENV: development
+      RAILS_LOG_TO_STDOUT: "true"
+      DATABASE_URL: postgres://postgres:postgres@db:5432/strong_mind_development
+    command: ["./bin/jobs"]
+  ingest:
+    <<: *app
+    profiles: ["tools"]
+    environment:
+      RAILS_ENV: development
+      RAILS_LOG_TO_STDOUT: "true"
+      DATABASE_URL: postgres://postgres:postgres@db:5432/strong_mind_development
+    command: ["./bin/rails", "ingest:run"]
+  test:
+    <<: *app
+    profiles: ["tools"]
+    environment:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@db:5432/strong_mind_test
+    command: ["./bin/rails", "test"]
+
+volumes:
+  pgdata:
