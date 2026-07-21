@@ -21,8 +21,8 @@ class RepositoryTest < ActiveSupport::TestCase
     never = Repository.create!(github_id: 2, fetched_at: nil)
     old   = Repository.create!(github_id: 3, fetched_at: 2.days.ago)
 
-    assert_equal [fresh], Repository.fresh.to_a
-    assert_equal [never, old], Repository.stale.order(:github_id).to_a
+    assert_equal [ fresh ], Repository.fresh.to_a
+    assert_equal [ never, old ], Repository.stale.order(:github_id).to_a
   end
 
   test "github_id is unique at the database level" do

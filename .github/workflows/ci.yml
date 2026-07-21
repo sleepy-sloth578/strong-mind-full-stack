@@ -84,7 +84,9 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          # DATABASE_URL must include the database name — database.yml is
+          # URL-driven (no `database:` key), so a nameless URL resolves to nil.
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/strong_mind_test
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test

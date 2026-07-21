@@ -16,9 +16,9 @@ class RawEventTest < ActiveSupport::TestCase
     processed = create_raw("event-processed", status: :processed)
     failed    = create_raw("evebt-failed", status: :failed, error: "boom")
 
-    assert_equal [pending],   RawEvent.pending.to_a
-    assert_equal [processed], RawEvent.processed.to_a
-    assert_equal [failed],    RawEvent.failed.to_a
+    assert_equal [ pending ],   RawEvent.pending.to_a
+    assert_equal [ processed ], RawEvent.processed.to_a
+    assert_equal [ failed ],    RawEvent.failed.to_a
   end
 
   test "github_event_id is unique at the database level" do
