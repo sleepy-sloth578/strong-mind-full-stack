@@ -22,6 +22,10 @@ Rails.application.configure do
   config.consider_all_requests_local = true
   config.cache_store = :null_store
 
+  # Enqueue jobs to the test adapter so specs can assert enqueues without
+  # running them (and never touch Solid Queue's tables during tests).
+  config.active_job.queue_adapter = :test
+
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
 
