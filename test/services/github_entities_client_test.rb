@@ -34,6 +34,16 @@ class GithubEntitiesClientTest < ActiveSupport::TestCase
     assert_equal "User", response.body["type"]
   end
 
+  test "url-encodes special characters in the path (e.g. bot logins)" do
+    encoded = stub_request(:get, "https://api.github.com/users/github-actions%5Bbot%5D")
+      .to_return(status: 200, body: { "type" => "Bot" }.to_json)
+
+    response = GithubEntitiesClient.fetch_user("github-actions[bot]")
+
+    assert_requested encoded
+    assert_equal 200, response.status
+  end
+
   test "surfaces a 404 status" do
     stub_request(:get, REPO_URL).to_return(status: 404, body: "")
 
