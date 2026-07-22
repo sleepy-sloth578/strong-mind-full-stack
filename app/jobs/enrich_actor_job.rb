@@ -5,7 +5,7 @@ class EnrichActorJob < ApplicationJob
     actor = Actor.find_by(id: actor_id)
     return unless actor&.stale?
 
-    response = GithubEntitiesClient.fetch_user(actor.login)
+    response = GithubEntitiesClient.fetch(actor.url)
 
     case response.status
     when 200

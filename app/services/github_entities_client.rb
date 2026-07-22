@@ -1,33 +1,14 @@
 require "net/http"
 require "json"
-require "erb"
-
 class GithubEntitiesClient
-  BASE_URL   = "https://api.github.com".freeze
   USER_AGENT = "strong-mind-ingestion".freeze
 
   Response  = Data.define(:status, :body, :rate_limit)
   RateLimit = Data.define(:remaining, :reset_at)
 
   class << self
-    def fetch_repository(full_name)
-      get("/repos/#{encode_path(full_name)}")
-    end
-
-    def fetch_user(login)
-      get("/users/#{encode_path(login)}")
-    end
-
-    private
-
-    # special characters — e.g. bot logins like "github-actions[bot]" — produce
-    # a valid URI instead of raising URI::InvalidURIError.
-    def encode_path(value)
-      value.split("/").map { |segment| ERB::Util.url_encode(segment) }.join("/")
-    end
-
-    def get(path)
-      uri     = URI("#{BASE_URL}#{path}")
+    def fetch(url)
+      uri     = URI(url)
       request = Net::HTTP::Get.new(uri)
       request["User-Agent"] = USER_AGENT
 
@@ -43,9 +24,11 @@ class GithubEntitiesClient
         rate_limit: rate_limit_from(response)
       )
     rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError, URI::InvalidURIError => e
-      Rails.logger.error("[github] GET #{path} failed: #{e.class}: #{e.message}")
+      Rails.logger.error("[github] GET #{url} failed: #{e.class}: #{e.message}")
       Response.new(status: 0, body: nil, rate_limit: RateLimit.new(remaining: nil, reset_at: nil))
     end
+
+    private
 
     def parse(body)
       body.present? ? JSON.parse(body) : nil

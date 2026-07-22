@@ -4,7 +4,7 @@ class EnrichRepositoryJobTest < ActiveSupport::TestCase
   REPO_URL = "https://api.github.com/repos/rails/rails".freeze
 
   def repository(**attrs)
-    Repository.create!({ github_id: 100, full_name: "rails/rails" }.merge(attrs))
+    Repository.create!({ github_id: 100, full_name: "rails/rails", url: REPO_URL }.merge(attrs))
   end
 
   def stub_repo(status:, body: {}, remaining: "50")

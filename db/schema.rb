@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
     t.string "login"
     t.string "name"
     t.datetime "updated_at", null: false
+    t.string "url"
     t.index ["github_id"], name: "index_actors_on_github_id", unique: true
   end
 
@@ -63,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_000004) do
     t.string "language"
     t.integer "stargazers_count"
     t.datetime "updated_at", null: false
+    t.string "url"
     t.index ["github_id"], name: "index_repositories_on_github_id", unique: true
   end
 

@@ -4,7 +4,7 @@ class EnrichActorJobTest < ActiveSupport::TestCase
   USER_URL = "https://api.github.com/users/octocat".freeze
 
   def actor(**attrs)
-    Actor.create!({ github_id: 200, login: "octocat" }.merge(attrs))
+    Actor.create!({ github_id: 200, login: "octocat", url: USER_URL }.merge(attrs))
   end
 
   def stub_user(status:, body: {}, remaining: "50")

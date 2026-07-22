@@ -5,7 +5,7 @@ class EnrichRepositoryJob < ApplicationJob
     repository = Repository.find_by(id: repository_id)
     return unless repository&.stale?
 
-    response = GithubEntitiesClient.fetch_repository(repository.full_name)
+    response = GithubEntitiesClient.fetch(repository.url)
 
     case response.status
     when 200

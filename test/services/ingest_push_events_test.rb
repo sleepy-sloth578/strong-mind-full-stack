@@ -7,8 +7,14 @@ class IngestPushEventsTest < ActiveSupport::TestCase
   def push_event_json(id:, push_id:, repo_id:, actor_id:)
     {
       "id" => id, "type" => "PushEvent",
-      "actor" => { "id" => actor_id, "login" => "octocat", "avatar_url" => "https://avatars/#{actor_id}" },
-      "repo"  => { "id" => repo_id, "name" => "org/repo-#{repo_id}" },
+      "actor" => {
+        "id" => actor_id, "login" => "octocat", "avatar_url" => "https://avatars/#{actor_id}",
+        "url" => "https://api.github.com/users/octocat"
+      },
+      "repo"  => {
+        "id" => repo_id, "name" => "org/repo-#{repo_id}",
+        "url" => "https://api.github.com/repos/org/repo-#{repo_id}"
+      },
       "payload" => {
         "push_id" => push_id, "ref" => "refs/heads/main",
         "head" => "head#{push_id}", "before" => "before#{push_id}"
@@ -42,11 +48,13 @@ class IngestPushEventsTest < ActiveSupport::TestCase
     repo = Repository.sole
     assert_equal 100, repo.github_id
     assert_equal "org/repo-100", repo.full_name
+    assert_equal "https://api.github.com/repos/org/repo-100", repo.url # payload-provided URL captured
     assert_nil repo.fetched_at
     assert repo.stale?
 
     actor = Actor.sole
     assert_equal "octocat", actor.login
+    assert_equal "https://api.github.com/users/octocat", actor.url
     assert_nil actor.fetched_at
   end
 

@@ -71,6 +71,7 @@ class IngestPushEvents
   def upsert_repository(repo)
     Repository.create_or_find_by!(github_id: repo.fetch("id")) do |repository|
       repository.full_name = repo["name"]
+      repository.url       = repo["url"]
     end
   end
 
@@ -78,6 +79,7 @@ class IngestPushEvents
     Actor.create_or_find_by!(github_id: actor.fetch("id")) do |record|
       record.login      = actor["login"]
       record.avatar_url = actor["avatar_url"]
+      record.url        = actor["url"]
     end
   end
 
