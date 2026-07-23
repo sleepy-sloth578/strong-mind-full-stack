@@ -8,6 +8,8 @@ class GithubEntitiesClient
 
   class << self
     def fetch(url)
+      return invalid_response if url.blank?
+
       uri     = URI(url)
       request = Net::HTTP::Get.new(uri)
       request["User-Agent"] = USER_AGENT
@@ -25,7 +27,7 @@ class GithubEntitiesClient
       )
     rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError, URI::InvalidURIError => e
       Rails.logger.error("[github] GET #{url} failed: #{e.class}: #{e.message}")
-      Response.new(status: 0, body: nil, rate_limit: RateLimit.new(remaining: nil, reset_at: nil))
+      invalid_response
     end
 
     private
@@ -42,6 +44,10 @@ class GithubEntitiesClient
         remaining: response["x-ratelimit-remaining"]&.to_i,
         reset_at:  reset ? Time.at(reset.to_i) : nil
       )
+    end
+
+    def invalid_response
+      Response.new(status: 0, body: nil, rate_limit: RateLimit.new(remaining: nil, reset_at: nil))
     end
   end
 end

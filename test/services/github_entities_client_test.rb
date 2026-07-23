@@ -63,6 +63,11 @@ class GithubEntitiesClientTest < ActiveSupport::TestCase
     assert_nil response.body
   end
 
+  test "degrades gracefully to status 0 on a blank/nil URL" do
+    assert_equal 0, GithubEntitiesClient.fetch(nil).status
+    assert_equal 0, GithubEntitiesClient.fetch("").status
+  end
+
   test "returns a nil body on malformed JSON" do
     stub_request(:get, REPO_URL).to_return(status: 200, body: "not json{")
 
